@@ -17,7 +17,7 @@ describe('testing the note router', function() {
       Note.remove({}).then(() => done()).catch(done);
     });
 
-    it('should return a note', (done) => {
+    it('should create a note', (done) => {
       request.post('localhost:3000/api/note')
       .send({
         name: 'test note',
@@ -25,7 +25,6 @@ describe('testing the note router', function() {
       })
       .then(res => {
         let note = res.body;
-        console.log(note);
         expect(res.status).to.eql(200);
         expect(note.name).to.eql('test note');
         expect(note.content).to.equal('this is my test note');
@@ -36,6 +35,28 @@ describe('testing the note router', function() {
   });
 
   describe('testing GET to api/note', function() {
-    before()
+    before((done) => {
+      Promise.all([
+        new Note({name: 'one note', content: 'noted'}).save(),
+        new Note({name: 'two note', content: 'duly noted'}).save()
+      ])
+      .then(() => done()).catch(done);
+    });
+
+    after((done) => {
+      Note.remove({}).then( () => done()).catch(done);
+    });
+
+    it('should return a note', (done) => {
+      request.get('localhost:3000/api/note')
+      .then(res => {
+        let notes = res.body;
+        expect(res.status).to.eql(200);
+        expect(notes[0].name).to.eql('one note');
+        expect(notes[1].name).to.eql('two note');
+        done();
+      })
+      .catch(done);
+    });
   });
 });

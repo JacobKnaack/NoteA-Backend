@@ -13,7 +13,6 @@ noteRouter.post('/note', jsonParser, function(req, res, next) {
   debug(' POST api/note');
   if(!req.body.name) return next(createError(400, 'failed, note needs a name'));
   new Note(req.body).save().then(note => {
-    console.log(note);
     res.json(note);
   }).catch(next);
 });
